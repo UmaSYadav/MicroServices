@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import com.netflix.discovery.DiscoveryClient;
 import com.uma.movies.dtos.CatalogItem;
 import com.uma.movies.dtos.Movies;
 import com.uma.movies.dtos.Rating;
@@ -23,6 +24,32 @@ public class MovieCatalogResourceController {
 
 	@Autowired private RestTemplate vRestTemplate;
 	@Autowired private WebClient.Builder vBuilder;
+	@Autowired private DiscoveryClient vDiscoveryClient;
+	
+	@RequestMapping("/er1/{pUserId}")
+	public List<CatalogItem> getCatalogsEurekaClient(@PathVariable("pUserId") String pUserId) {
+		UserRatings vUserRatings= vRestTemplate.getForObject("http://movie-rating-service/ratingddata/users/" + pUserId, UserRatings.class);
+		List<Rating> vAlRatings= vUserRatings.getAlRatings();
+		
+		
+		return vAlRatings.stream().map((rating)-> {
+			Movies vMovies= vRestTemplate.getForObject("http://movie-info-service/movies/" + rating.getsMovieId(), Movies.class);
+			return new CatalogItem(vMovies.getsName(), "Arnold", rating.getiRatings());
+		}).collect(Collectors.toList());
+	}
+	
+	@RequestMapping("/er/{pUserId}")
+	public List<CatalogItem> getCatalogsEureka(@PathVariable("pUserId") String pUserId) {
+		UserRatings vUserRatings= vRestTemplate.getForObject("http://movie-rating-service/ratingddata/users/" + pUserId, UserRatings.class);
+		List<Rating> vAlRatings= vUserRatings.getAlRatings();
+		
+		
+		return vAlRatings.stream().map((rating)-> {
+			Movies vMovies= vRestTemplate.getForObject("http://movie-info-service/movies/" + rating.getsMovieId(), Movies.class);
+			return new CatalogItem(vMovies.getsName(), "Arnold", rating.getiRatings());
+		}).collect(Collectors.toList());
+	}
+	
 	
 	@RequestMapping("/{pUserId}")
 	public List<CatalogItem> getCatalogs(@PathVariable("pUserId") String pUserId) {
