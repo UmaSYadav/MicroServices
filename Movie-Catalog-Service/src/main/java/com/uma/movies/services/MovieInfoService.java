@@ -16,7 +16,13 @@ public class MovieInfoService {
 
 	@Autowired private RestTemplate vRestTemplate;
 	
-	@HystrixCommand(fallbackMethod = "getFallbackRatings"/*,
+	@HystrixCommand(fallbackMethod = "getFallbackRatings",
+			threadPoolKey = "ratings",
+			threadPoolProperties = {
+				@HystrixProperty(name = "coreSize", value = "20"),
+				@HystrixProperty(name = "maxQueueSize", value = "10")
+			}
+		/*,
 			commandProperties = {
 					@HystrixProperty(name = "circuitBreaker.requestVolumeThreshold", value = "5")
 			}*/
