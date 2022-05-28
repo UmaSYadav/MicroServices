@@ -13,6 +13,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import com.netflix.discovery.DiscoveryClient;
+import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
 import com.uma.movies.dtos.CatalogItem;
 import com.uma.movies.dtos.Movies;
 import com.uma.movies.dtos.Rating;
@@ -24,10 +25,12 @@ public class MovieCatalogResourceController {
 
 	@Autowired private RestTemplate vRestTemplate;
 	@Autowired private WebClient.Builder vBuilder;
-	@Autowired private DiscoveryClient vDiscoveryClient;
+	//@Autowired 
+	private DiscoveryClient vDiscoveryClient;
 	
-	@RequestMapping("/er1/{pUserId}")
-	public List<CatalogItem> getCatalogsEurekaClient(@PathVariable("pUserId") String pUserId) {
+	@RequestMapping("/hys/{pUserId}")
+	@HystrixCommand(fallbackMethod = "getFallbackCatalog")
+	public List<CatalogItem> getCatalogsHtstrix(@PathVariable("pUserId") String pUserId) {
 		UserRatings vUserRatings= vRestTemplate.getForObject("http://movie-rating-service/ratingddata/users/" + pUserId, UserRatings.class);
 		List<Rating> vAlRatings= vUserRatings.getAlRatings();
 		
@@ -37,6 +40,14 @@ public class MovieCatalogResourceController {
 			return new CatalogItem(vMovies.getsName(), "Arnold", rating.getiRatings());
 		}).collect(Collectors.toList());
 	}
+	
+	public List<CatalogItem> getFallbackCatalog(@PathVariable("pUserId") String pUserId) {
+		return Arrays.asList(new CatalogItem("No Movie available", "", 0));
+	}
+	
+	
+	
+	
 	
 	@RequestMapping("/er/{pUserId}")
 	public List<CatalogItem> getCatalogsEureka(@PathVariable("pUserId") String pUserId) {
