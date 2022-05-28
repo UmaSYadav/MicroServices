@@ -4,6 +4,7 @@ import java.util.List;
 
 public class UserRatings {
 
+	private String sUserId;
 	private List<Rating> alRatings;
 
 	public UserRatings(List<Rating> alRatings) {
@@ -18,6 +19,12 @@ public class UserRatings {
 	}
 	public void setAlRatings(List<Rating> alRatings) {
 		this.alRatings = alRatings;
+	}
+	public String getsUserId() {
+		return sUserId;
+	}
+	public void setsUserId(String sUserId) {
+		this.sUserId = sUserId;
 	}
 	
 }

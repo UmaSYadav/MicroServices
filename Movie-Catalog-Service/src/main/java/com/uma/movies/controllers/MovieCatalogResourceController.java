@@ -18,6 +18,8 @@ import com.uma.movies.dtos.CatalogItem;
 import com.uma.movies.dtos.Movies;
 import com.uma.movies.dtos.Rating;
 import com.uma.movies.dtos.UserRatings;
+import com.uma.movies.services.MovieInfoService;
+import com.uma.movies.services.RatingInfoService;
 
 @RestController
 @RequestMapping("/catalog")
@@ -28,9 +30,31 @@ public class MovieCatalogResourceController {
 	//@Autowired 
 	private DiscoveryClient vDiscoveryClient;
 	
+	@Autowired MovieInfoService vMovieInfoService;
+	@Autowired RatingInfoService vRatingInfoService;
+	
+	
+	@RequestMapping("/hys1/{pUserId}")
+	public List<CatalogItem> getCatalogsHtstrixIdeal(@PathVariable("pUserId") String pUserId) {
+		UserRatings vUserRatings= vMovieInfoService.getUserRatings(pUserId);
+		List<Rating> vAlRatings= vUserRatings.getAlRatings();
+		return vAlRatings.stream().map((rating)-> {
+			return vRatingInfoService.findCatalogItem(rating);
+		}).collect(Collectors.toList());
+	}
+	
+	
+
+	
+
+
+
+
+
 	@RequestMapping("/hys/{pUserId}")
 	@HystrixCommand(fallbackMethod = "getFallbackCatalog")
 	public List<CatalogItem> getCatalogsHtstrix(@PathVariable("pUserId") String pUserId) {
+		//fallback method needed in circuit break for method calls within the class, hystrix doesnot work in this case.
 		UserRatings vUserRatings= vRestTemplate.getForObject("http://movie-rating-service/ratingddata/users/" + pUserId, UserRatings.class);
 		List<Rating> vAlRatings= vUserRatings.getAlRatings();
 		
