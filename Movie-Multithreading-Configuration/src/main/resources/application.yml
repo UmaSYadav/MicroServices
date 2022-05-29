@@ -1,0 +1,12 @@
+server:
+  port: 4003
+my:
+  greeting: Hello
+  list:
+    values: one,two,three
+keyValues: "{str:'val1', 'str2': 'val2'}"
+db:
+  url: http://mnmm.com
+  username: user
+  password: pass
+  port: 6000
