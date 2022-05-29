@@ -6,9 +6,7 @@ my:
     values: one,two,three
 keyValues: "{str:'val1', 'str2': 'val2'}"
 db:
-  url: http://mnmm.com
-  username: user
-  password: pass
-  port: 6000
-  
-spring:  profiles:    active: test
+  url: http://profile-test.com
+  username: usertest
+  password: passtest
+  port: 6001
